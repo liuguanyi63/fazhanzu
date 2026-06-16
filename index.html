@@ -13,7 +13,1743 @@
       --text-primary: #1a1a2e;
       --text-secondary: #6b7280;
       --accent: #2563eb;
+      --accent-light: #eff6ff;<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>工作流程管理</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2563eb">
+  <style>
+    :root {
+      --bg: #f5f6f8;
+      --surface: #ffffff;
+      --text-primary: #1a1a2e;
+      --text-secondary: #6b7280;
+      --accent: #2563eb;
       --accent-light: #eff6ff;
+      --danger: #ef4444;
+      --danger-light: #fef2f2;
+      --border: #e5e7eb;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+      --shadow-lg: 0 12px 32px rgba(0,0,0,0.08);
+      --radius: 16px;
+      --radius-sm: 10px;
+      --transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px 48px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 28px;
+      animation: fadeInDown 0.6s ease both;
+      width: 100%;
+      max-width: 720px;
+    }
+
+    header h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-weight: 300;
+    }
+
+    .toolbar {
+      width: 100%;
+      max-width: 720px;
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      animation: fadeInUp 0.5s ease both;
+      animation-delay: 0.1s;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 4px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      border: none;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover, .btn-primary:active {
+      background: #1d4ed8;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover, .btn-secondary:active {
+      background: var(--bg);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-danger {
+      background: var(--danger-light);
+      color: var(--danger);
+      border: 1px solid #fecaca;
+    }
+
+    .btn-danger:hover, .btn-danger:active {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .btn svg {
+      width: 14px;
+      height: 14px;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+      stroke: currentColor;
+      flex-shrink: 0;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 720px;
+    }
+
+    /* ====== Stage (Big) ====== */
+    .stage {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 16px;
+      overflow: hidden;
+      transition: box-shadow var(--transition);
+      animation: fadeInUp 0.6s ease both;
+    }
+
+    .stage:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .stage-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 20px;
+      cursor: pointer;
+      user-select: none;
+      transition: background var(--transition);
+    }
+
+    .stage-header:hover {
+      background: var(--accent-light);
+    }
+
+    .stage-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .stage-number {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+      transition: transform var(--transition);
+    }
+
+    .stage-header:hover .stage-number {
+      transform: scale(1.08);
+    }
+
+    .stage-name-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .stage-name {
+      font-size: 1.05rem;
+      font-weight: 500;
+    }
+
+    .stage-desc {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      font-weight: 300;
+    }
+
+    .stage-toggle {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform var(--transition), background var(--transition);
+      border: none;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .stage-toggle svg {
+      width: 14px;
+      height: 14px;
+      stroke: var(--text-secondary);
+      transition: stroke var(--transition);
+      fill: none;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .stage-header:hover .stage-toggle {
+      background: var(--accent);
+    }
+
+    .stage-header:hover .stage-toggle svg {
+      stroke: #fff;
+    }
+
+    .stage.open .stage-toggle {
+      transform: rotate(180deg);
+    }
+
+    .stage-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height var(--transition), padding var(--transition);
+      padding: 0 20px;
+    }
+
+    .stage.open .stage-body {
+      max-height: 3000px;
+      padding: 0 20px 20px;
+    }
+
+    /* ====== Substage (Small, inside Stage) ====== */
+    .substage {
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      margin-bottom: 12px;
+      overflow: hidden;
+      transition: box-shadow var(--transition);
+    }
+
+    .substage:hover {
+      box-shadow: var(--shadow-sm);
+    }
+
+    .substage-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      cursor: pointer;
+      user-select: none;
+      transition: background var(--transition);
+    }
+
+    .substage-header:hover {
+      background: var(--accent-light);
+    }
+
+    .substage-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .substage-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .substage-name {
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .substage-toggle {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform var(--transition);
+      border: none;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .substage-toggle svg {
+      width: 12px;
+      height: 12px;
+      stroke: var(--text-secondary);
+      fill: none;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .substage.open .substage-toggle {
+      transform: rotate(180deg);
+    }
+
+    .substage-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height var(--transition), padding var(--transition);
+      padding: 0 16px;
+    }
+
+    .substage.open .substage-body {
+      max-height: 2000px;
+      padding: 0 16px 16px;
+    }
+
+    .substage-text {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 14px;
+      white-space: pre-wrap;
+    }
+
+    .substage-files {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .substage-file-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: var(--surface);
+      transition: background var(--transition), transform var(--transition);
+      cursor: pointer;
+      position: relative;
+    }
+
+    .substage-file-item:hover {
+      background: var(--accent-light);
+      transform: translateX(3px);
+    }
+
+    .substage-file-item .file-actions {
+      display: none;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .substage-file-item:hover .file-actions {
+      display: flex;
+    }
+
+    .file-actions .btn-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background var(--transition);
+      padding: 0;
+    }
+
+    .file-actions .btn-icon:hover {
+      background: rgba(0,0,0,0.06);
+    }
+
+    .file-actions .btn-icon svg {
+      width: 13px;
+      height: 13px;
+      stroke: var(--text-secondary);
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .file-actions .btn-icon.delete:hover svg {
+      stroke: var(--danger);
+    }
+
+    .substage-file-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .substage-file-icon svg {
+      width: 14px;
+      height: 14px;
+      stroke: var(--accent);
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .substage-file-name {
+      font-size: 0.85rem;
+      font-weight: 400;
+      flex: 1;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .substage-file-meta {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+
+    .substage-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .substage-actions .btn {
+      padding: 5px 12px;
+      font-size: 0.78rem;
+    }
+
+    /* ====== Section Label ====== */
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin: 16px 0 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .section-label .btn-small {
+      padding: 4px 10px;
+      font-size: 0.72rem;
+      border-radius: 6px;
+    }
+
+    /* ====== Empty State ====== */
+    .empty-state {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+
+    /* ====== Modal ====== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition);
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal {
+      background: var(--surface);
+      border-radius: var(--radius) var(--radius) 0 0;
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(100%);
+      transition: transform var(--transition);
+    }
+
+    .modal-overlay.active .modal {
+      transform: translateY(0);
+    }
+
+    @media (min-width: 640px) {
+      .modal-overlay {
+        align-items: center;
+        padding: 20px;
+      }
+      .modal {
+        border-radius: var(--radius);
+        transform: translateY(16px) scale(0.97);
+        max-height: 85vh;
+      }
+      .modal-overlay.active .modal {
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .modal-header {
+      padding: 20px 20px 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: var(--bg);
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-close svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .modal-body {
+      padding: 16px 20px;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-bottom: 5px;
+      color: var(--text-primary);
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      background: var(--bg);
+      transition: border-color var(--transition), box-shadow var(--transition);
+      -webkit-appearance: none;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .file-drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-sm);
+      padding: 24px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition);
+      background: var(--bg);
+    }
+
+    .file-drop-zone:hover,
+    .file-drop-zone.dragover {
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    .file-drop-zone svg {
+      width: 32px;
+      height: 32px;
+      stroke: var(--text-secondary);
+      margin-bottom: 8px;
+      fill: none;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .file-drop-zone p {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+
+    .file-drop-zone .file-name-preview {
+      color: var(--accent);
+      font-weight: 500;
+      margin-top: 6px;
+      font-size: 0.85rem;
+    }
+
+    .modal-footer {
+      padding: 0 20px 20px;
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    /* ====== Share Panel ====== */
+    .share-panel {
+      width: 100%;
+      max-width: 720px;
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      animation: fadeInUp 0.5s ease both;
+      animation-delay: 0.05s;
+    }
+
+    .share-panel h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .share-url-box {
+      display: flex;
+      gap: 8px;
+    }
+
+    .share-url-box input {
+      flex: 1;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.85rem;
+      background: var(--bg);
+      color: var(--text-primary);
+      -webkit-appearance: none;
+    }
+
+    .share-url-box input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    /* ====== Cloud Status Bar ====== */
+    .cloud-status {
+      width: 100%;
+      max-width: 720px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px;
+      background: var(--surface);
+      border-radius: var(--radius-sm);
+      margin-bottom: 12px;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .cloud-status .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    .cloud-status .status-dot.online { background: #22c55e; }
+    .cloud-status .status-dot.offline { background: #f59e0b; }
+    .cloud-status .status-dot.saving { background: var(--accent); animation: pulse 1s infinite; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* ====== Password Screen ====== */
+    .password-screen {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 3000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .password-screen.hidden { display: none; }
+
+    .password-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      padding: 32px 28px;
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+    }
+
+    .password-card h2 {
+      font-size: 1.2rem;
+      margin-bottom: 6px;
+    }
+
+    .password-card p {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+
+    .password-card input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.95rem;
+      margin-bottom: 14px;
+      text-align: center;
+      letter-spacing: 4px;
+    }
+
+    .password-card input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+
+    .password-card .btn {
+      width: 100%;
+      justify-content: center;
+      padding: 12px;
+      font-size: 0.95rem;
+    }
+
+    .password-card .error-msg {
+      color: var(--danger);
+      font-size: 0.82rem;
+      margin-top: 10px;
+      min-height: 20px;
+    }
+
+    /* ====== Toast ====== */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--text-primary);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 500;
+      box-shadow: var(--shadow-lg);
+      z-index: 2000;
+      transition: transform var(--transition);
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .stage:nth-child(1) { animation-delay: 0.05s; }
+    .stage:nth-child(2) { animation-delay: 0.15s; }
+    .stage:nth-child(3) { animation-delay: 0.25s; }
+
+    @media (min-width: 640px) {
+      body { padding: 48px 20px 60px; }
+      header h1 { font-size: 2rem; }
+      header p { font-size: 0.95rem; }
+      .stage-header { padding: 22px 28px; }
+      .stage.open .stage-body { padding: 0 28px 28px; }
+      .stage-name { font-size: 1.15rem; }
+      .stage-number { width: 40px; height: 40px; font-size: 1rem; }
+      .substage-header { padding: 16px 20px; }
+      .substage-name { font-size: 1rem; }
+      .substage-body { padding: 0 20px; }
+      .substage.open .substage-body { padding: 0 20px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Password Screen -->
+  <div class="password-screen hidden" id="passwordScreen">
+    <div class="password-card">
+      <h2>需要密码</h2>
+      <p>此工作流程已设置密码保护</p>
+      <input type="password" id="passwordInput" placeholder="输入访问密码" onkeydown="if(event.key==='Enter')verifyPassword()">
+      <button class="btn btn-primary" onclick="verifyPassword()">解锁</button>
+      <div class="error-msg" id="passwordError"></div>
+    </div>
+  </div>
+
+  <header>
+    <h1 id="pageTitle">工作流程</h1>
+    <p id="pageSubtitle">点击阶段展开查看详细内容</p>
+  </header>
+
+  <div class="toolbar">
+    <button class="btn btn-primary" onclick="openStageModal()">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      添加阶段
+    </button>
+    <button class="btn btn-secondary" onclick="exportData()">
+      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+      导出
+    </button>
+    <label class="btn btn-secondary" style="cursor:pointer;">
+      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+      导入
+      <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importData(this)">
+    </label>
+    <button class="btn btn-secondary" onclick="toggleShare()">
+      <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+      分享
+    </button>
+  </div>
+
+  <!-- Cloud Status -->
+  <div class="cloud-status" id="cloudStatus">
+    <span><span class="status-dot offline" id="statusDot"></span><span id="statusText">本地模式</span></span>
+    <button class="btn btn-secondary" style="padding:4px 10px;font-size:0.75rem;" onclick="openCloudModal()">云端设置</button>
+  </div>
+
+  <div class="share-panel" id="sharePanel" style="display:none;">
+    <h3>分享链接</h3>
+    <p style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:10px;">将下方链接发送给他人，对方打开即可查看和编辑</p>
+    <div class="share-url-box">
+      <input type="text" id="shareUrl" readonly>
+      <button class="btn btn-primary" onclick="copyShareUrl()">复制</button>
+    </div>
+    <div style="margin-top:12px;">
+      <div class="form-group" style="margin-bottom:0;">
+        <label>设置访问密码（可选，留空则无需密码）</label>
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="sharePassword" placeholder="设置密码保护隐私" style="flex:1;">
+          <button class="btn btn-primary" onclick="setSharePassword()">保存密码</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container" id="stagesContainer"></div>
+
+  <!-- Modal: Stage -->
+  <div class="modal-overlay" id="stageModal">
+    <div class="modal">
+      <div class="modal-header">
+        <span id="stageModalTitle">添加阶段</span>
+        <button class="modal-close" onclick="closeModal('stageModal')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>阶段名称</label>
+          <input type="text" id="stageName" placeholder="例如：前期准备">
+        </div>
+        <div class="form-group">
+          <label>阶段描述</label>
+          <input type="text" id="stageDesc" placeholder="例如：材料收集与初步整理">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('stageModal')">取消</button>
+        <button class="btn btn-primary" onclick="saveStage()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Substage -->
+  <div class="modal-overlay" id="substageModal">
+    <div class="modal">
+      <div class="modal-header">
+        <span id="substageModalTitle">添加子阶段</span>
+        <button class="modal-close" onclick="closeModal('substageModal')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>子阶段名称</label>
+          <input type="text" id="substageName" placeholder="例如：收集个人档案">
+        </div>
+        <div class="form-group">
+          <label>详细描述</label>
+          <textarea id="substageDesc" placeholder="在此输入该子阶段的详细说明..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('substageModal')">取消</button>
+        <button class="btn btn-primary" onclick="saveSubstage()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: File -->
+  <div class="modal-overlay" id="fileModal">
+    <div class="modal">
+      <div class="modal-header">
+        <span id="fileModalTitle">添加附件</span>
+        <button class="modal-close" onclick="closeModal('fileModal')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>文件名称</label>
+          <input type="text" id="fileName" placeholder="例如：个人档案汇总表">
+        </div>
+        <div class="form-group">
+          <label>选择文件</label>
+          <div class="file-drop-zone" id="fileDropZone" onclick="document.getElementById('fileInput').click()">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            <p>点击或拖拽文件到此处</p>
+            <p class="file-name-preview" id="filePreview"></p>
+          </div>
+          <input type="file" id="fileInput" style="display:none;" onchange="onFileSelected(this)">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('fileModal')">取消</button>
+        <button class="btn btn-primary" onclick="saveFile()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Cloud Settings -->
+  <div class="modal-overlay" id="cloudModal">
+    <div class="modal">
+      <div class="modal-header">
+        <span>云端设置</span>
+        <button class="modal-close" onclick="closeModal('cloudModal')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:16px;">
+          启用云端同步后，数据将保存在云端，手机和电脑都能实时访问和编辑。
+        </p>
+        <div id="cloudNotConnected">
+          <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;font-size:0.95rem;" onclick="connectCloud()">
+            启用云端同步
+          </button>
+        </div>
+        <div id="cloudConnected" style="display:none;">
+          <div style="background:var(--accent-light);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:12px;">
+            <div style="font-size:0.82rem;color:var(--accent);font-weight:500;">云端已连接</div>
+            <div style="font-size:0.78rem;color:var(--text-secondary);margin-top:4px;">数据ID: <span id="blobIdDisplay" style="font-family:monospace;"></span></div>
+          </div>
+          <button class="btn btn-secondary" style="width:100%;justify-content:center;padding:10px;" onclick="disconnectCloud()">
+            断开云端（保留本地数据）
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ===================== Constants =====================
+    const API_BASE = 'https://api.jsonblob.com';
+    const DEFAULT_STAGES = [
+      {
+        id: 's1', name: '前期准备', desc: '材料收集与初步整理',
+        substages: [
+          { id: 'ss1', name: '收集个人档案', desc: '前往人事部门调取个人档案复印件，确保档案完整无缺失。需要携带身份证原件和复印件各一份。', files: [
+            { id: 'f1', name: '个人档案汇总表', meta: 'PDF · 2.3 MB', content: null },
+            { id: 'f2', name: '档案调取申请表', meta: 'DOCX · 156 KB', content: null }
+          ]},
+          { id: 'ss2', name: '核对社保缴纳记录', desc: '登录社保局官网或前往窗口打印近15年社保缴纳明细。如发现断缴需及时补缴。', files: [
+            { id: 'f3', name: '社保缴纳记录', meta: 'PDF · 890 KB', content: null }
+          ]},
+          { id: 'ss3', name: '开具工作年限证明', desc: '向单位人事部门申请开具工作年限证明，需注明入职日期和岗位信息。', files: [
+            { id: 'f4', name: '工作年限证明模板', meta: 'DOCX · 98 KB', content: null }
+          ]}
+        ]
+      },
+      {
+        id: 's2', name: '审批流程', desc: '单位审核与上级批复',
+        substages: [
+          { id: 'ss4', name: '提交单位初审', desc: '将所有材料提交至单位人事部门进行初步审核。审核周期一般为3-5个工作日。', files: [
+            { id: 'f5', name: '退休审批表', meta: 'PDF · 1.1 MB', content: null },
+            { id: 'f6', name: '单位意见函', meta: 'DOCX · 120 KB', content: null }
+          ]},
+          { id: 'ss5', name: '等待上级批复', desc: '初审通过后，材料将上报至上级主管部门审批。此阶段可能需要补充额外材料。', files: [
+            { id: 'f7', name: '上级批复文件', meta: 'PDF · 450 KB', content: null }
+          ]}
+        ]
+      },
+      {
+        id: 's3', name: '退休交接', desc: '工作移交与退休手续办理',
+        substages: [
+          { id: 'ss6', name: '工作交接', desc: '整理手头工作，制作交接清单，与接手同事逐项确认。确保无遗留事项。', files: [
+            { id: 'f8', name: '工作交接清单', meta: 'XLSX · 320 KB', content: null }
+          ]},
+          { id: 'ss7', name: '办理退休证', desc: '携带批复文件到人社局办理退休证，同时申请养老金。需准备一寸照片2张。', files: [
+            { id: 'f9', name: '退休证办理指南', meta: 'PDF · 1.5 MB', content: null },
+            { id: 'f10', name: '养老金申领表', meta: 'PDF · 780 KB', content: null }
+          ]}
+        ]
+      }
+    ];
+
+    // ===================== State =====================
+    let stages = JSON.parse(localStorage.getItem('workflow_stages_v2')) || JSON.parse(JSON.stringify(DEFAULT_STAGES));
+    let currentStageId = null;
+    let currentSubstageId = null;
+    let currentFileData = null;
+    let editingStageId = null;
+    let editingSubstageId = null;
+
+    // Cloud state
+    let blobId = localStorage.getItem('workflow_blob_id') || null;
+    let blobETag = localStorage.getItem('workflow_blob_etag') || null;
+    let isSaving = false;
+    let saveTimer = null;
+    let sharePassword = localStorage.getItem('workflow_password') || '';
+
+    // ===================== Cloud API =====================
+    async function cloudCreate(data) {
+      const res = await fetch(API_BASE + '/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (!res.ok) throw new Error('创建失败');
+      const location = res.headers.get('Location');
+      const id = location.replace('/', '');
+      blobETag = res.headers.get('ETag');
+      blobId = id;
+      localStorage.setItem('workflow_blob_id', id);
+      localStorage.setItem('workflow_blob_etag', blobETag);
+      updateCloudStatus();
+      return id;
+    }
+
+    async function cloudRead(id) {
+      const res = await fetch(API_BASE + '/' + id);
+      if (!res.ok) throw new Error('读取失败');
+      blobETag = res.headers.get('ETag');
+      localStorage.setItem('workflow_blob_etag', blobETag);
+      return await res.json();
+    }
+
+    async function cloudUpdate(id, data) {
+      const headers = { 'Content-Type': 'application/json' };
+      if (blobETag) headers['If-Match'] = blobETag;
+      const res = await fetch(API_BASE + '/' + id, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify(data)
+      });
+      if (res.status === 412) {
+        // Conflict: someone else updated, re-read and merge
+        const latest = await cloudRead(id);
+        stages = latest.stages || latest;
+        render();
+        return cloudUpdate(id, buildCloudData());
+      }
+      if (!res.ok) throw new Error('更新失败');
+      blobETag = res.headers.get('ETag');
+      localStorage.setItem('workflow_blob_etag', blobETag);
+    }
+
+    function buildCloudData() {
+      return { stages, password: sharePassword, updatedAt: Date.now() };
+    }
+
+    async function saveToCloud() {
+      if (!blobId || isSaving) return;
+      isSaving = true;
+      updateCloudStatus('saving');
+      try {
+        const data = buildCloudData();
+        const dataSize = JSON.stringify(data).length;
+        if (dataSize > 100 * 1024) {
+          showToast('数据超过100KB限制，部分附件可能无法同步');
+          console.warn('Data size exceeds 100KB limit:', dataSize);
+        }
+        await cloudUpdate(blobId, data);
+        updateCloudStatus('online');
+      } catch (e) {
+        console.error('Cloud save failed:', e);
+        updateCloudStatus('offline');
+        showToast('云端保存失败，请检查网络');
+      }
+      isSaving = false;
+    }
+
+    function scheduleCloudSave() {
+      if (!blobId) return;
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => saveToCloud(), 1000);
+    }
+
+    async function connectCloud() {
+      try {
+        showToast('正在连接云端...');
+        const data = buildCloudData();
+        const id = await cloudCreate(data);
+        blobId = id;
+        updateCloudStatus('online');
+        closeModal('cloudModal');
+        showToast('云端同步已启用');
+        // Update URL
+        const url = new URL(window.location);
+        url.searchParams.set('id', blobId);
+        url.searchParams.delete('data');
+        window.history.replaceState({}, '', url);
+      } catch (e) {
+        showToast('连接失败，请重试');
+        console.error(e);
+      }
+    }
+
+    function disconnectCloud() {
+      if (!confirm('断开后数据将只保存在本地，确定？')) return;
+      blobId = null;
+      blobETag = null;
+      localStorage.removeItem('workflow_blob_id');
+      localStorage.removeItem('workflow_blob_etag');
+      updateCloudStatus();
+      document.getElementById('cloudNotConnected').style.display = '';
+      document.getElementById('cloudConnected').style.display = 'none';
+      closeModal('cloudModal');
+      showToast('已断开云端');
+    }
+
+    function updateCloudStatus(state) {
+      const dot = document.getElementById('statusDot');
+      const text = document.getElementById('statusText');
+      const notConnected = document.getElementById('cloudNotConnected');
+      const connected = document.getElementById('cloudConnected');
+
+      if (blobId) {
+        notConnected.style.display = 'none';
+        connected.style.display = '';
+        document.getElementById('blobIdDisplay').textContent = blobId.substring(0, 8) + '...';
+      } else {
+        notConnected.style.display = '';
+        connected.style.display = 'none';
+      }
+
+      if (state === 'saving') {
+        dot.className = 'status-dot saving';
+        text.textContent = '正在保存...';
+      } else if (blobId) {
+        dot.className = 'status-dot online';
+        text.textContent = '云端已同步';
+      } else {
+        dot.className = 'status-dot offline';
+        text.textContent = '本地模式';
+      }
+    }
+
+    async function loadFromCloud(id) {
+      try {
+        showToast('正在从云端加载...');
+        const data = await cloudRead(id);
+        if (data.stages) {
+          stages = data.stages;
+        } else {
+          stages = data;
+        }
+        if (data.password) {
+          sharePassword = data.password;
+          localStorage.setItem('workflow_password', sharePassword);
+        }
+        blobId = id;
+        localStorage.setItem('workflow_blob_id', id);
+        render();
+        updateCloudStatus('online');
+        showToast('云端数据已加载');
+      } catch (e) {
+        console.error('Failed to load from cloud:', e);
+        showToast('加载失败');
+      }
+    }
+
+    // ===================== Password =====================
+    function verifyPassword() {
+      const input = document.getElementById('passwordInput').value;
+      if (input === sharePassword) {
+        document.getElementById('passwordScreen').classList.add('hidden');
+        localStorage.setItem('workflow_auth', '1');
+      } else {
+        document.getElementById('passwordError').textContent = '密码错误，请重试';
+        document.getElementById('passwordInput').value = '';
+      }
+    }
+
+    function checkPassword() {
+      if (!sharePassword) return true;
+      if (localStorage.getItem('workflow_auth') === '1') return true;
+      document.getElementById('passwordScreen').classList.remove('hidden');
+      document.getElementById('passwordInput').focus();
+      return false;
+    }
+
+    function setSharePassword() {
+      const pw = document.getElementById('sharePassword').value.trim();
+      sharePassword = pw;
+      localStorage.setItem('workflow_password', pw);
+      if (pw) {
+        localStorage.removeItem('workflow_auth');
+      }
+      showToast(pw ? '密码已设置' : '密码已清除');
+      scheduleCloudSave();
+    }
+
+    // ===================== Render =====================
+    function render() {
+      const container = document.getElementById('stagesContainer');
+      container.innerHTML = stages.map((stage, index) => `
+        <div class="stage" data-stage="${stage.id}" id="stage-${stage.id}">
+          <div class="stage-header" onclick="toggleStage('${stage.id}')">
+            <div class="stage-title">
+              <div class="stage-number">${index + 1}</div>
+              <div class="stage-name-wrap">
+                <div class="stage-name">${escapeHtml(stage.name)}</div>
+                <div class="stage-desc">${escapeHtml(stage.desc)} · ${stage.substages.length} 个子阶段</div>
+              </div>
+            </div>
+            <div class="stage-toggle" onclick="event.stopPropagation(); toggleStage('${stage.id}')">
+              <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+          </div>
+          <div class="stage-body">
+            <div class="section-label">
+              子阶段
+              <button class="btn btn-primary btn-small" onclick="event.stopPropagation(); openSubstageModal('${stage.id}')">
+                <svg viewBox="0 0 24 24" style="width:12px;height:12px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                添加
+              </button>
+            </div>
+            ${stage.substages.length === 0 ? '<div class="empty-state">暂无子阶段</div>' : stage.substages.map(ss => `
+              <div class="substage" id="substage-${ss.id}">
+                <div class="substage-header" onclick="toggleSubstage('${ss.id}')">
+                  <div class="substage-title-wrap">
+                    <div class="substage-dot"></div>
+                    <div class="substage-name">${escapeHtml(ss.name)}</div>
+                  </div>
+                  <div class="substage-toggle" onclick="event.stopPropagation(); toggleSubstage('${ss.id}')">
+                    <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  </div>
+                </div>
+                <div class="substage-body">
+                  <div class="substage-text">${escapeHtml(ss.desc)}</div>
+                  ${ss.files.length > 0 ? `
+                    <div class="substage-files">
+                      ${ss.files.map(f => `
+                        <div class="substage-file-item" onclick="downloadFile('${f.id}', '${ss.id}', '${stage.id}')">
+                          <div class="substage-file-icon">
+                            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                          </div>
+                          <div class="substage-file-name">${escapeHtml(f.name)}</div>
+                          <div class="substage-file-meta">${escapeHtml(f.meta)}</div>
+                          <div class="file-actions" onclick="event.stopPropagation();">
+                            <button class="btn-icon" onclick="editFile('${f.id}', '${ss.id}', '${stage.id}')" title="编辑附件">
+                              <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                            </button>
+                            <button class="btn-icon delete" onclick="deleteFile('${f.id}', '${ss.id}', '${stage.id}')" title="删除附件">
+                              <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
+                          </div>
+                        </div>
+                      `).join('')}
+                    </div>
+                  ` : ''}
+                  <div class="substage-actions">
+                    <button class="btn btn-secondary" onclick="openFileModal('${stage.id}', '${ss.id}')">
+                      <svg viewBox="0 0 24 24" style="width:12px;height:12px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                      添加附件
+                    </button>
+                    <button class="btn btn-secondary" onclick="editSubstage('${ss.id}', '${stage.id}')">
+                      <svg viewBox="0 0 24 24" style="width:12px;height:12px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                      编辑
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteSubstage('${ss.id}', '${stage.id}')">
+                      <svg viewBox="0 0 24 24" style="width:12px;height:12px;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                      删除
+                    </button>
+                  </div>
+                </div>
+              </div>
+            `).join('')}
+
+            <div style="margin-top:16px;display:flex;gap:8px;">
+              <button class="btn btn-secondary" onclick="editStage('${stage.id}')">
+                <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                编辑阶段
+              </button>
+              <button class="btn btn-danger" onclick="deleteStage('${stage.id}')">
+                <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                删除阶段
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      saveData();
+      scheduleCloudSave();
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ===================== Toggle =====================
+    function toggleStage(id) {
+      const el = document.getElementById('stage-' + id);
+      el.classList.toggle('open');
+    }
+
+    function toggleSubstage(id) {
+      const el = document.getElementById('substage-' + id);
+      el.classList.toggle('open');
+    }
+
+    // ===================== Stage =====================
+    function openStageModal() {
+      editingStageId = null;
+      document.getElementById('stageModalTitle').textContent = '添加阶段';
+      document.getElementById('stageName').value = '';
+      document.getElementById('stageDesc').value = '';
+      openModal('stageModal');
+    }
+
+    function editStage(id) {
+      editingStageId = id;
+      const stage = stages.find(s => s.id === id);
+      document.getElementById('stageModalTitle').textContent = '编辑阶段';
+      document.getElementById('stageName').value = stage.name;
+      document.getElementById('stageDesc').value = stage.desc;
+      openModal('stageModal');
+    }
+
+    function saveStage() {
+      const name = document.getElementById('stageName').value.trim();
+      const desc = document.getElementById('stageDesc').value.trim();
+      if (!name) { showToast('请输入阶段名称'); return; }
+
+      if (editingStageId) {
+        const stage = stages.find(s => s.id === editingStageId);
+        stage.name = name;
+        stage.desc = desc;
+      } else {
+        stages.push({ id: 's' + Date.now(), name, desc, substages: [] });
+      }
+      closeModal('stageModal');
+      render();
+      showToast(editingStageId ? '阶段已更新' : '阶段已添加');
+    }
+
+    function deleteStage(id) {
+      if (!confirm('确定要删除这个阶段吗？')) return;
+      stages = stages.filter(s => s.id !== id);
+      render();
+      showToast('阶段已删除');
+    }
+
+    // ===================== Substage =====================
+    function openSubstageModal(stageId) {
+      currentStageId = stageId;
+      editingSubstageId = null;
+      document.getElementById('substageModalTitle').textContent = '添加子阶段';
+      document.getElementById('substageName').value = '';
+      document.getElementById('substageDesc').value = '';
+      openModal('substageModal');
+    }
+
+    function editSubstage(substageId, stageId) {
+      currentStageId = stageId;
+      editingSubstageId = substageId;
+      const stage = stages.find(s => s.id === stageId);
+      const ss = stage.substages.find(x => x.id === substageId);
+      document.getElementById('substageModalTitle').textContent = '编辑子阶段';
+      document.getElementById('substageName').value = ss.name;
+      document.getElementById('substageDesc').value = ss.desc;
+      openModal('substageModal');
+    }
+
+    function saveSubstage() {
+      const name = document.getElementById('substageName').value.trim();
+      const desc = document.getElementById('substageDesc').value.trim();
+      if (!name) { showToast('请输入子阶段名称'); return; }
+
+      const stage = stages.find(s => s.id === currentStageId);
+
+      if (editingSubstageId) {
+        const ss = stage.substages.find(x => x.id === editingSubstageId);
+        ss.name = name;
+        ss.desc = desc;
+      } else {
+        stage.substages.push({ id: 'ss' + Date.now(), name, desc, files: [] });
+      }
+      closeModal('substageModal');
+      render();
+      showToast(editingSubstageId ? '子阶段已更新' : '子阶段已添加');
+    }
+
+    function deleteSubstage(substageId, stageId) {
+      if (!confirm('确定删除此子阶段？')) return;
+      const stage = stages.find(s => s.id === stageId);
+      stage.substages = stage.substages.filter(x => x.id !== substageId);
+      render();
+      showToast('子阶段已删除');
+    }
+
+    // ===================== File =====================
+    function openFileModal(stageId, substageId) {
+      currentStageId = stageId;
+      currentSubstageId = substageId;
+      currentFileData = null;
+      document.getElementById('fileModalTitle').textContent = '添加附件';
+      document.getElementById('fileName').value = '';
+      document.getElementById('filePreview').textContent = '';
+      openModal('fileModal');
+    }
+
+    function onFileSelected(input) {
+      const file = input.files[0];
+      if (!file) return;
+      document.getElementById('filePreview').textContent = file.name;
+      const reader = new FileReader();
+      reader.onload = e => {
+        currentFileData = { name: file.name, type: file.type, data: e.target.result };
+      };
+      reader.readAsDataURL(file);
+    }
+
+    const dropZone = document.getElementById('fileDropZone');
+    if (dropZone) {
+      dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+      dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+      dropZone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        const file = e.dataTransfer.files[0];
+        if (file) {
+          document.getElementById('filePreview').textContent = file.name;
+          const reader = new FileReader();
+          reader.onload = ev => {
+            currentFileData = { name: file.name, type: file.type, data: ev.target.result };
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+
+    async function saveFile() {
+      const name = document.getElementById('fileName').value.trim();
+      const stage = stages.find(s => s.id === currentStageId);
+      const ss = stage.substages.find(x => x.id === currentSubstageId);
+      if (!name && !currentFileData) { showToast('请输入文件名称或选择文件'); return; }
+
+      const fileName = name || (currentFileData ? currentFileData.name : '未命名');
+      const meta = currentFileData
+        ? `${currentFileData.name.split('.').pop().toUpperCase()} · ${formatSize(currentFileData.data.length)}`
+        : '文本';
+
+      ss.files.push({ id: 'f' + Date.now(), name: fileName, meta, content: currentFileData });
+      closeModal('fileModal');
+      render();
+      showToast('附件已添加');
+      
+      // 立即保存到云端
+      if (blobId) {
+        await saveToCloud();
+      }
+    }
+
+    function downloadFile(fileId, substageId, stageId) {
+      const stage = stages.find(s => s.id === stageId);
+      const ss = stage.substages.find(x => x.id === substageId);
+      const file = ss.files.find(f => f.id === fileId);
+      if (file.content && file.content.data) {
+        const a = document.createElement('a');
+        a.href = file.content.data;
+        a.download = file.content.name || file.name;
+        a.click();
+      } else {
+        showToast('此文件暂无附件');
+      }
+    }
+
+    function editFile(fileId, substageId, stageId) {
+      const stage = stages.find(s => s.id === stageId);
+      const ss = stage.substages.find(x => x.id === substageId);
+      const file = ss.files.find(f => f.id === fileId);
+      const newName = prompt('修改附件名称：', file.name);
+      if (newName !== null && newName.trim() !== '') {
+        file.name = newName.trim();
+        render();
+        showToast('附件已更新');
+      }
+    }
+
+    function deleteFile(fileId, substageId, stageId) {
+      if (!confirm('确定要删除这个附件吗？')) return;
+      const stage = stages.find(s => s.id === stageId);
+      const ss = stage.substages.find(x => x.id === substageId);
+      ss.files = ss.files.filter(f => f.id !== fileId);
+      render();
+      showToast('附件已删除');
+    }
+
+    // ===================== Modal =====================
+    function openModal(id) {
+      document.getElementById(id).classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function openCloudModal() {
+      openModal('cloudModal');
+    }
+
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', e => {
+        if (e.target === overlay) closeModal(overlay.id);
+      });
+    });
+
+    // ===================== Share =====================
+    function toggleShare() {
+      const panel = document.getElementById('sharePanel');
+      if (panel.style.display === 'none') {
+        let url;
+        if (blobId) {
+          url = window.location.origin + window.location.pathname + '?id=' + blobId;
+        } else {
+          const data = JSON.stringify(stages);
+          const encoded = btoa(unescape(encodeURIComponent(data)));
+          url = window.location.origin + window.location.pathname + '?data=' + encoded;
+        }
+        document.getElementById('shareUrl').value = url;
+        document.getElementById('sharePassword').value = sharePassword;
+        panel.style.display = 'block';
+      } else {
+        panel.style.display = 'none';
+      }
+    }
+
+    function copyShareUrl() {
+      const input = document.getElementById('shareUrl');
+      input.select();
+      navigator.clipboard.writeText(input.value).then(() => {
+        showToast('链接已复制');
+      }).catch(() => {
+        document.execCommand('copy');
+        showToast('链接已复制');
+      });
+    }
+
+    // ===================== Export / Import =====================
+    function exportData() {
+      const data = JSON.stringify(stages, null, 2);
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'workflow-backup-' + new Date().toISOString().slice(0,10) + '.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('备份已导出');
+    }
+
+    function importData(input) {
+      const file = input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          stages = JSON.parse(e.target.result);
+          render();
+          showToast('备份已恢复');
+        } catch (err) {
+          showToast('文件格式错误');
+        }
+      };
+      reader.readAsText(file);
+      input.value = '';
+    }
+
+    // ===================== Storage =====================
+    function saveData() {
+      localStorage.setItem('workflow_stages_v2', JSON.stringify(stages));
+    }
+
+    // ===================== Utils =====================
+    function formatSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // ===================== Init =====================
+    (async function init() {
+      const params = new URLSearchParams(window.location.search);
+      const cloudId = params.get('id');
+      const sharedData = params.get('data');
+
+      if (cloudId) {
+        // Load from cloud
+        await loadFromCloud(cloudId);
+        if (checkPassword()) {
+          render();
+        }
+      } else if (sharedData) {
+        // Legacy: load from URL data
+        try {
+          stages = JSON.parse(decodeURIComponent(escape(atob(sharedData))));
+          showToast('已加载分享内容');
+        } catch (e) {
+          console.error('Failed to load shared data', e);
+        }
+        if (checkPassword()) {
+          render();
+        }
+      } else {
+        // Check if we have a saved blobId
+        if (blobId) {
+          try {
+            await loadFromCloud(blobId);
+          } catch (e) {
+            console.warn('Cloud load failed, using local data');
+          }
+        }
+        if (checkPassword()) {
+          render();
+        }
+      }
+
+      updateCloudStatus();
+    })();
+  </script>
+</body>
+</html>
+
       --danger: #ef4444;
       --danger-light: #fef2f2;
       --border: #e5e7eb;
